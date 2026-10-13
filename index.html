@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%E2%AD%90%3C/text%3E%3C/svg%3E">
+<title>Olivia's Homework Stars</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: one column "sticker book" — big tap target for today, then the month calendar, then the reward ladder. */
+:root{
+  --sky:#e9f5ff; --paper:#ffffff; --ink:#23305a; --muted:#6a77a3;
+  --sun:#ffc53d; --sun-deep:#f29d00; --grass:#3fbf7f; --berry:#ff5d8f; --sea:#3d8bff;
+  --line:#d8e6f7; --cell:#f4f9ff; --shadow:0 4px 0 #c9daf0;
+  --display:"Baloo 2","Comic Sans MS","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --sky:#131a33; --paper:#1d2647; --ink:#eef2ff; --muted:#9ba8d6;
+  --sun:#ffcf5a; --sun-deep:#ffad1f; --grass:#4fd395; --berry:#ff7aa3; --sea:#6aa6ff;
+  --line:#2c3866; --cell:#242e57; --shadow:0 4px 0 #0c1128; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sky:#131a33; --paper:#1d2647; --ink:#eef2ff; --muted:#9ba8d6;
+  --sun:#ffcf5a; --sun-deep:#ffad1f; --grass:#4fd395; --berry:#ff7aa3; --sea:#6aa6ff;
+  --line:#2c3866; --cell:#242e57; --shadow:0 4px 0 #0c1128; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--sky);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+  background-image:radial-gradient(circle at 12% 8%, color-mix(in srgb,var(--sun) 22%,transparent) 0 70px,transparent 71px),
+  radial-gradient(circle at 92% 30%, color-mix(in srgb,var(--berry) 14%,transparent) 0 50px,transparent 51px);}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:20px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
+h1{font-size:clamp(1.9rem,6vw,2.6rem);font-weight:800}
+h2{font-size:1.45rem;font-weight:800}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--sea);outline-offset:3px;border-radius:10px}
+
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.name{background:none;border:none;padding:0;font:inherit;color:inherit;text-align:left}
+.name:hover .pen{opacity:1}
+.pen{font-size:.9rem;opacity:.35;color:var(--muted);font-family:var(--body);margin-left:6px}
+.sub{color:var(--muted);font-weight:700;margin:2px 0 0}
+#nameForm{display:flex;gap:8px;flex-wrap:wrap}
+input,select{font:inherit;color:var(--ink);background:var(--cell);border:2px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow)}
+
+/* Today */
+.today{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.bigstar{width:120px;height:120px;border-radius:50%;border:4px dashed var(--line);background:var(--cell);display:grid;place-items:center;transition:transform .15s}
+.bigstar svg{width:78px;height:78px}
+.bigstar .st{fill:none;stroke:var(--muted);stroke-width:3}
+.bigstar.on{border:4px solid var(--sun-deep);background:color-mix(in srgb,var(--sun) 30%,var(--paper))}
+.bigstar.on .st{fill:var(--sun);stroke:var(--sun-deep)}
+.bigstar:active{transform:scale(.94)}
+.today p{margin:4px 0 0;color:var(--muted);font-weight:700}
+.today .date{font-family:var(--display);font-size:1.3rem;font-weight:800;color:var(--ink);margin:0}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:14px 10px;text-align:center}
+.stat b{display:block;font-family:var(--display);font-size:2.2rem;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat.s1 b{color:var(--sun-deep)} .stat.s2 b{color:var(--berry)} .stat.s3 b{color:var(--grass)}
+
+/* Calendar */
+.calhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.nav{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--cell);font-weight:800;font-size:1.2rem}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dow{text-align:center;font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding-bottom:2px}
+.day{aspect-ratio:1;max-width:100%;border-radius:14px;border:2px solid transparent;background:var(--cell);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-weight:800;font-variant-numeric:tabular-nums;padding:2px;position:relative}
+.day .n{font-size:.95rem}
+.day .mini{width:60%;max-width:30px;height:auto}
+.day .mini path{fill:var(--sun);stroke:var(--sun-deep);stroke-width:2}
+.day.done{background:color-mix(in srgb,var(--sun) 28%,var(--paper));border-color:var(--sun)}
+.day.done .n{font-size:.7rem;position:absolute;top:3px;left:6px;color:var(--muted)}
+.day.today{border-color:var(--sea)}
+.day.wknd{opacity:.65}
+.day.future{opacity:.35;cursor:default}
+.day.blank{background:none}
+.hint{color:var(--muted);font-size:.88rem;margin:12px 0 0;font-weight:700}
+
+/* Rewards */
+.rhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.rlist{display:flex;flex-direction:column;gap:12px}
+.reward{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:16px;background:var(--cell);border:2px solid var(--line)}
+.reward .ico{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:1.8rem;background:var(--paper)}
+.reward .t{font-weight:800;min-width:0;overflow-wrap:anywhere}
+.reward .meta{font-size:.85rem;color:var(--muted);font-weight:700}
+.bar{height:12px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--berry));border-radius:99px;transition:width .4s}
+.reward.ready{border-color:var(--grass);background:color-mix(in srgb,var(--grass) 14%,var(--paper))}
+.reward.claimed{opacity:.6}
+.ract{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.btn{border:none;border-radius:12px;padding:10px 14px;font-weight:800;background:var(--sea);color:#fff;box-shadow:0 3px 0 color-mix(in srgb,var(--sea) 60%,#000)}
+.btn.green{background:var(--grass);box-shadow:0 3px 0 color-mix(in srgb,var(--grass) 60%,#000)}
+.btn.ghost{background:none;color:var(--muted);box-shadow:none;padding:4px 6px;font-size:.85rem}
+.btn.danger{background:var(--berry);box-shadow:none;padding:6px 10px;font-size:.85rem}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.empty{color:var(--muted);font-weight:700;padding:8px 0}
+
+form.add{display:grid;grid-template-columns:auto 1fr 110px auto;gap:8px;margin-top:16px;align-items:end}
+form.add label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;min-width:0}
+.ideas{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{border:2px dashed var(--line);background:none;border-radius:99px;padding:6px 12px;font-weight:700;font-size:.9rem;color:var(--muted)}
+.chip:hover{border-color:var(--sea);color:var(--ink)}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:14px;font-weight:800;z-index:20;max-width:calc(100% - 32px);text-align:center}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:10;width:100%;height:100%}
+.sync{font-size:.78rem;color:var(--muted);text-align:center;font-weight:700}
+
+@media (max-width:520px){
+  .today{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .stat b{font-size:1.8rem}
+  form.add{grid-template-columns:auto 1fr;}
+  form.add .goal{grid-column:1}
+  form.add .btn{grid-column:2}
+  .reward{grid-template-columns:44px 1fr}
+  .reward .ico{width:44px;height:44px;font-size:1.5rem}
+  .ract{grid-column:1/-1;flex-direction:row;justify-content:flex-end}
+  .day{border-radius:10px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>html,body{margin:0}body{min-height:100vh}</style>
+</head>
+<body>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header>
+    <div>
+      <button class="name" id="nameBtn" aria-label="Change name"><h1><span id="nameText">Olivia</span>'s Homework Stars<span class="pen">✎ edit</span></h1></button>
+      <form id="nameForm" hidden><input id="nameInput" maxlength="20" aria-label="Name"><button class="btn" type="submit">Save</button></form>
+      <p class="sub">Grade 1 · one star for every homework day</p>
+    </div>
+  </header>
+
+  <section class="panel today" aria-label="Today">
+    <button class="bigstar" id="todayBtn" aria-pressed="false" aria-label="Mark today's homework done">
+      <svg viewBox="0 0 24 24"><path class="st" stroke-linejoin="round" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>
+    </button>
+    <div>
+      <p class="date" id="todayDate"></p>
+      <p id="todayMsg">Tap the star when homework is done!</p>
+    </div>
+  </section>
+
+  <section class="stats" aria-label="Progress">
+    <div class="stat s1"><b id="sTotal">0</b><span>Stars total</span></div>
+    <div class="stat s2"><b id="sStreak">0</b><span>Day streak</span></div>
+    <div class="stat s3"><b id="sMonth">0</b><span>This month</span></div>
+  </section>
+
+  <section class="panel" aria-label="Calendar">
+    <div class="calhead">
+      <button class="nav" id="prev" aria-label="Previous month">‹</button>
+      <h2 id="monthTitle"></h2>
+      <button class="nav" id="next" aria-label="Next month">›</button>
+    </div>
+    <div class="grid" id="cal"></div>
+    <p class="hint">Tap any day to add or remove a star. Friday and Saturday never break the streak.</p>
+  </section>
+
+  <section class="panel" aria-label="Rewards">
+    <div class="rhead"><h2>Rewards</h2><span class="sub" id="nextUp"></span></div>
+    <div class="rlist" id="rlist"></div>
+    <form class="add" id="addForm">
+      <label>Icon<select id="rEmoji">
+        <option>🍦</option><option>🎁</option><option>🧸</option><option>🎨</option><option>🎬</option><option>🛝</option><option>🍕</option><option>📚</option><option>🌙</option><option>⭐</option>
+      </select></label>
+      <label>Reward<input id="rTitle" placeholder="Ice cream after school" maxlength="40" required></label>
+      <label class="goal">After # stars<input id="rGoal" type="number" min="1" max="365" value="5" inputmode="numeric" required></label>
+      <button class="btn" type="submit">Add</button>
+    </form>
+    <div class="ideas" aria-label="Reward ideas">
+      <button class="chip" data-e="🍦" data-t="Ice cream treat" data-g="5">🍦 Ice cream · 5</button>
+      <button class="chip" data-e="🛝" data-t="Trip to the park" data-g="10">🛝 Park trip · 10</button>
+      <button class="chip" data-e="🎬" data-t="Movie night pick" data-g="15">🎬 Movie night · 15</button>
+      <button class="chip" data-e="🧸" data-t="Small toy" data-g="25">🧸 Small toy · 25</button>
+    </div>
+  </section>
+  <p class="sync" id="sync"></p>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const STAR='M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z';
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const $=id=>document.getElementById(id);
+const key=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const todayKey=()=>key(new Date());
+
+let state={name:'Olivia',done:{},rewards:[]};
+let view=new Date(); view.setDate(1);
+let ref=null, writing=Promise.resolve(), confirmDel=null;
+
+/* ---------- storage: shared db when available, browser storage otherwise ---------- */
+function loadLocal(){try{const s=JSON.parse(localStorage.getItem('hw-stars')||'null');if(s)state=norm(s);}catch(e){}}
+function saveLocal(){try{localStorage.setItem('hw-stars',JSON.stringify(state));}catch(e){}}
+function norm(s){return{name:typeof s.name==='string'&&s.name?s.name:'Olivia',done:s.done&&typeof s.done==='object'?{...s.done}:{},rewards:Array.isArray(s.rewards)?s.rewards.map(r=>({...r})):[]}}
+function save(){
+  saveLocal();
+  if(!ref)return;
+  const snap=JSON.parse(JSON.stringify(state));
+  writing=writing.then(()=>ref.set(snap)).then(()=>{$('sync').textContent='Saved · works on every device you open this on';})
+    .catch(()=>{$('sync').textContent='Saved on this device only right now.';});
+}
+loadLocal();
+(async()=>{
+  try{
+    const db=await window.claude?.use?.('db');
+    if(!db){$('sync').textContent='Saved on this device.';return;}
+    ref=db.doc('tracker/main');
+    let first=true;
+    ref.onSnapshot(s=>{
+      if(s.exists){state=norm(s.data());saveLocal();render();}
+      else if(first&&(Object.keys(state.done).length||state.rewards.length)){save();}
+      first=false;
+      $('sync').textContent='Saved · works on every device you open this on';
+    },()=>{$('sync').textContent='Saved on this device.';});
+  }catch(e){$('sync').textContent='Saved on this device.';}
+})();
+
+/* ---------- logic ---------- */
+const total=()=>Object.keys(state.done).filter(k=>state.done[k]).length;
+function streak(){
+  const d=new Date(); let n=0;
+  if(!state.done[key(d)]) d.setDate(d.getDate()-1);
+  for(let i=0;i<400;i++){
+    const k=key(d), wd=d.getDay();
+    if(state.done[k]) n++;
+    else if(wd!==5&&wd!==6) break;
+    d.setDate(d.getDate()-1);
+  }
+  return n;
+}
+function toggle(k,celebrate){
+  const before=total();
+  if(state.done[k]) delete state.done[k]; else state.done[k]=true;
+  const after=total();
+  save(); render();
+  if(after>before&&celebrate){
+    confetti();
+    const hit=state.rewards.find(r=>!r.claimed&&before<r.goal&&after>=r.goal);
+    toast(hit?`Reward unlocked: ${hit.emoji} ${hit.title}!`:`Great job, ${state.name}! ⭐`);
+  }
+}
+
+/* ---------- render ---------- */
+function render(){
+  $('nameText').textContent=state.name;
+  const now=new Date(), tk=todayKey(), on=!!state.done[tk];
+  $('todayDate').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  $('todayMsg').textContent=on?'Homework done today. Super star!':'Tap the star when homework is done!';
+  $('todayBtn').classList.toggle('on',on);
+  $('todayBtn').setAttribute('aria-pressed',on);
+  $('todayBtn').setAttribute('aria-label',on?"Undo today's star":"Mark today's homework done");
+
+  const t=total();
+  $('sTotal').textContent=t; $('sStreak').textContent=streak();
+  const mPrefix=key(now).slice(0,7);
+  $('sMonth').textContent=Object.keys(state.done).filter(k=>state.done[k]&&k.startsWith(mPrefix)).length;
+
+  // calendar
+  $('monthTitle').textContent=MONTHS[view.getMonth()]+' '+view.getFullYear();
+  const cal=$('cal'); let h=DOW.map(d=>`<div class="dow">${d}</div>`).join('');
+  const start=view.getDay(), days=new Date(view.getFullYear(),view.getMonth()+1,0).getDate();
+  for(let i=0;i<start;i++) h+='<div class="day blank"></div>';
+  for(let d=1;d<=days;d++){
+    const dt=new Date(view.getFullYear(),view.getMonth(),d), k=key(dt), done=!!state.done[k];
+    const fut=k>tk, wk=dt.getDay()===5||dt.getDay()===6;
+    const cls=['day',done&&'done',k===tk&&'today',fut&&'future',wk&&!done&&'wknd'].filter(Boolean).join(' ');
+    h+=`<button class="${cls}" data-k="${k}" ${fut?'disabled':''} aria-pressed="${done}" aria-label="${dt.toDateString()}${done?', homework done':''}"><span class="n">${d}</span>${done?`<svg class="mini" viewBox="0 0 24 24"><path stroke-linejoin="round" d="${STAR}"/></svg>`:''}</button>`;
+  }
+  cal.innerHTML=h;
+  const nm=new Date(view); nm.setMonth(nm.getMonth()+1);
+  $('next').disabled=nm>now; $('next').style.opacity=nm>now?.35:1;
+
+  // rewards
+  const rl=$('rlist'), rs=[...state.rewards].sort((a,b)=>(a.claimed-b.claimed)||(a.goal-b.goal));
+  if(!rs.length){rl.innerHTML='<p class="empty">No rewards yet. Add one below, or tap an idea to start.</p>';}
+  else rl.innerHTML=rs.map(r=>{
+    const pct=Math.min(100,Math.round(t/r.goal*100)), ready=t>=r.goal&&!r.claimed, left=Math.max(0,r.goal-t);
+    const meta=r.claimed?`Claimed on ${new Date(r.claimed).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:ready?'Ready to claim!':`${t} of ${r.goal} stars · ${left} to go`;
+    const del=confirmDel===r.id?`<button class="btn danger" data-del="${r.id}">Remove?</button>`:`<button class="btn ghost" data-ask="${r.id}">Remove</button>`;
+    return `<div class="reward${ready?' ready':''}${r.claimed?' claimed':''}">
+      <div class="ico" aria-hidden="true">${r.emoji}</div>
+      <div style="min-width:0"><div class="t"></div><div class="meta">${meta}</div><div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>
+      <div class="ract">${ready?`<button class="btn green" data-claim="${r.id}">Claim</button>`:''}${del}</div></div>`;
+  }).join('');
+  // titles as text (safe)
+  rl.querySelectorAll('.t').forEach((el,i)=>el.textContent=rs[i].title);
+  const nxt=rs.filter(r=>!r.claimed&&t<r.goal)[0];
+  $('nextUp').textContent=nxt?`Next: ${nxt.emoji} in ${nxt.goal-t} star${nxt.goal-t===1?'':'s'}`:'';
+}
+
+/* ---------- events ---------- */
+$('todayBtn').onclick=()=>toggle(todayKey(),true);
+$('cal').onclick=e=>{const b=e.target.closest('[data-k]');if(b&&!b.disabled)toggle(b.dataset.k,true);};
+$('prev').onclick=()=>{view.setMonth(view.getMonth()-1);render();};
+$('next').onclick=()=>{const n=new Date(view);n.setMonth(n.getMonth()+1);if(n<=new Date()){view=n;render();}};
+$('nameBtn').onclick=()=>{$('nameBtn').hidden=true;$('nameForm').hidden=false;$('nameInput').value=state.name;$('nameInput').focus();};
+$('nameForm').onsubmit=e=>{e.preventDefault();const v=$('nameInput').value.trim();if(v){state.name=v;save();}$('nameForm').hidden=true;$('nameBtn').hidden=false;render();};
+function addReward(emoji,title,goal){
+  state.rewards.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),emoji,title,goal,claimed:null});
+  save();render();toast(`Added: ${emoji} ${title} after ${goal} stars`);
+}
+$('addForm').onsubmit=e=>{e.preventDefault();const t=$('rTitle').value.trim(),g=parseInt($('rGoal').value,10);
+  if(!t||!(g>0))return;addReward($('rEmoji').value,t,g);$('rTitle').value='';};
+document.querySelector('.ideas').onclick=e=>{const c=e.target.closest('.chip');if(c)addReward(c.dataset.e,c.dataset.t,+c.dataset.g);};
+$('rlist').onclick=e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.claim){const r=state.rewards.find(x=>x.id===b.dataset.claim);if(r){r.claimed=new Date().toISOString();save();render();confetti();toast(`Enjoy your ${r.title}! ${r.emoji}`);}}
+  else if(b.dataset.ask){confirmDel=b.dataset.ask;render();}
+  else if(b.dataset.del){state.rewards=state.rewards.filter(x=>x.id!==b.dataset.del);confirmDel=null;save();render();}
+};
+
+/* ---------- fun bits ---------- */
+let tt;
+function toast(m){const el=$('toast');el.textContent=m;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,2600);}
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const c=$('confetti'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+  const cs=getComputedStyle(document.documentElement);
+  const cols=['--sun','--berry','--sea','--grass','--sun-deep'].map(v=>cs.getPropertyValue(v).trim());
+  const ps=Array.from({length:110},()=>({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*13-4,s:Math.random()*8+5,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:cols[Math.floor(Math.random()*cols.length)],star:Math.random()<.35}));
+  let f=0;(function tick(){x.clearRect(0,0,c.width,c.height);
+    ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;
+      if(p.star){x.scale(p.s/12,p.s/12);x.translate(-12,-12);x.fill(new Path2D(STAR));}else x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore();});
+    if(++f<110)requestAnimationFrame(tick);else x.clearRect(0,0,c.width,c.height);})();
+}
+render();
+setInterval(()=>{const k=todayKey();if(k!==render.k){render.k=k;render();}},60000);render.k=todayKey();
+</script>
+
+</body>
+</html>
